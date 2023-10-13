@@ -1,10 +1,10 @@
 package clusterpeers
 
 import (
-    "os"
     "fmt"
     "sync"
     "time"
+    "strings"
     "net"
     "net/rpc"
     "github/paxoscluster/recovery"
@@ -49,17 +49,27 @@ func ConstructCluster(roleId uint64, disk *recovery.Manager) (*Cluster, uint64, 
 
     // Auto-detects roleId
     if roleId == 0 {
-        // Finds IPv4 address of current machine
-        name, err := os.Hostname()
-        if err != nil { return nil, 0, "", err }
-        ipInfo, err := net.LookupIP(name)
-        if err != nil { return nil, 0, "", err }
+        // Finds local address of current machine
         thisAddress := ""
-        for _, ip := range ipInfo {
-            ipv4 := ip.To4()
-            if ipv4 != nil {
-                thisAddress = ip.String()
-                break
+        ifaces, err := net.Interfaces()
+        if err != nil { return nil, 0, "", err }
+        for _, i := range ifaces {
+            addrs, err := i.Addrs()
+            if err != nil { return nil, 0, "", err }
+            for _, addr := range addrs {
+                var ip net.IP
+                switch v := addr.(type) {
+                case *net.IPNet:
+                        ip = v.IP
+                case *net.IPAddr:
+                        ip = v.IP
+                }
+                // process IP address
+                // TODO: Change prefix accordingly (Depends on subnets)
+                if strings.HasPrefix(ip.String(), "192.168.0") {
+                    thisAddress = ip.String()
+                    break
+                }
             }
         }
 

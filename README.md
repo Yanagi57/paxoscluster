@@ -1,7 +1,7 @@
 PaxosCluster
 ============
 
-A framework for distributed applications. Implements the Multi-Paxos protocol. Written in Go 1.2.
+A framework for distributed applications. Implements the Multi-Paxos protocol. Written in Go 1.2. (For cross compilation, use Go 1.5+, I'm using 1.5.4)
 
 Video demo: http://www.youtube.com/watch?v=jyel-iADuUU
 
@@ -28,4 +28,12 @@ You can change the ports on which the processes listen by editing the `coldstora
 
 ## Run on cluster of machines
 
-TODO
+To run this mode, 
+
+1. Update peers.csv file, include all the local address of machines in the network
+2. execute `go build` to build for current system
+3. execute `env GOOS=windows GOARCH=amd64 go build` to build for Windows
+4. execute `env GOOS=darwin GOARCH=amd64 go build` to build for MacOS
+5. execute `env GOOS=linux GOARCH=amd64 go build` to build for Linux
+
+> Wait for all the devices to establish connections first before sending messages.
